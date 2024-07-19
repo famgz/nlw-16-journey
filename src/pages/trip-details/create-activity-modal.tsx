@@ -1,13 +1,43 @@
-import { XIcon, TagIcon, CalendarIcon } from 'lucide-react';
+import { CalendarIcon, TagIcon, XIcon } from 'lucide-react';
+import { FormEvent } from 'react';
 import Button from '../../components/button';
+import { api } from '../../lib/axios';
 
 interface CreateActivityModalProps {
+  tripId: string | undefined;
   closeCreateActivityModal: () => void;
+  setTripTrigger: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export default function CreateActivityModal({
+  tripId,
+  setTripTrigger,
   closeCreateActivityModal,
 }: CreateActivityModalProps) {
+  async function createActivity(
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> {
+    event.preventDefault();
+
+    if (!tripId) return;
+
+    const data = new FormData(event.currentTarget);
+
+    const title = data.get('title');
+    const occurs_at = data.get('occurs_at');
+
+    if (!(title && occurs_at)) return;
+
+    await api.post(`/trips/${tripId}/activities`, {
+      title,
+      occurs_at,
+    });
+
+    setTripTrigger((prev) => prev + 1);
+
+    closeCreateActivityModal();
+  }
+
   return (
     <div className="flex-center fixed inset-0 bg-black/90">
       <div className="w-[640px] space-y-5 rounded-xl bg-zinc-900 px-6 py-5 shadow-shape">
@@ -23,7 +53,7 @@ export default function CreateActivityModal({
           </p>
         </div>
 
-        <form className="space-y-3">
+        <form onSubmit={createActivity} className="space-y-3">
           <div className="flex h-14 items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-2.5">
             <TagIcon className="text-5 text-zinc-400" />
             <input

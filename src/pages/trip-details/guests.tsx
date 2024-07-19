@@ -1,16 +1,27 @@
 import { UserCogIcon } from 'lucide-react';
 import Guest from './guest';
 import Button from '../../components/button';
+import { Participant } from '../../types/trip';
 
-export default function Guests() {
+interface GuestsProps {
+  participants: Participant[];
+}
+
+export default function Guests({ participants }: GuestsProps) {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-bold">Convidados</h2>
 
       {/* convidados */}
       <div className="space-y-5">
-        <Guest email="jessica.white@email.com" name="Jessica White" />
-        <Guest email="miranda@email.com" name="Dr. Sarah Miranda" />
+        {participants.map((p, i) => (
+          <Guest
+            email={p.email}
+            name={p.name || `Convidado ${i}`}
+            is_confirmed={p.is_confirmed}
+            key={p.id}
+          />
+        ))}
       </div>
 
       <Button size="full" variant="secondary">
